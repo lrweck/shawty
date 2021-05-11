@@ -12,6 +12,7 @@ import (
 	sh "github.com/lrweck/shawty/shortener"
 )
 
+// Interface for endpoint handlers
 type RedirectHandler interface {
 	Get(*fiber.Ctx) error
 	Post(*fiber.Ctx) error
@@ -21,12 +22,14 @@ type handler struct {
 	redirectService sh.RedirectService
 }
 
+// Creates a new handler for the RedirectService
 func NewHandler(redirectService sh.RedirectService) RedirectHandler {
 	return &handler{
 		redirectService: redirectService,
 	}
 }
 
+// Sends a statuscode and response to the user
 func setupResponse(f *fiber.Ctx, contentType string, statusCode int, body []byte) error {
 	f.Append("Content-Type", contentType)
 	f.Status(statusCode)
@@ -38,6 +41,7 @@ func setupResponse(f *fiber.Ctx, contentType string, statusCode int, body []byte
 	return nil
 }
 
+// Serializes queries according to the content-type header
 func (h *handler) serializer(contentType string) sh.RedirectSerializer {
 	switch contentType {
 	case "application/x-msgpack":
@@ -51,6 +55,7 @@ func (h *handler) serializer(contentType string) sh.RedirectSerializer {
 	}
 }
 
+// Implements the Handler GET method, which accepts a code as query param
 func (h *handler) Get(f *fiber.Ctx) error {
 	code := f.Params("code")
 	redirect, err := h.redirectService.Find(code)
@@ -64,6 +69,7 @@ func (h *handler) Get(f *fiber.Ctx) error {
 	return nil
 }
 
+// Implements the Handler POST method. Accepts JSON and MsgPack for now.
 func (h *handler) Post(f *fiber.Ctx) error {
 	contentType := f.Get("Content-Type")
 	requestBody := f.Body()
