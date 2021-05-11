@@ -30,7 +30,7 @@ func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return client, err
+	return client, nil
 }
 
 func NewMongoRepo(mongoURL, mongoDB string, mongoTimeout int) (short.RedirectRepository, error) {

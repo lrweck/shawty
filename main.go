@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	h "github.com/lrweck/shawty/api"
 	mdb "github.com/lrweck/shawty/repository/mongodb"
+	pg "github.com/lrweck/shawty/repository/postgresql"
 	red "github.com/lrweck/shawty/repository/redis"
 	"github.com/lrweck/shawty/shortener"
 )
@@ -60,6 +61,15 @@ func chooseRepo() shortener.RedirectRepository {
 
 	fmt.Println("choose db")
 	switch os.Getenv("URL_DB") {
+	case "pg":
+		pgURL := os.Getenv("PG_URL")
+		pgTimeout, _ := strconv.Atoi(os.Getenv("PG_TIMEOUT"))
+		repo, err := pg.NewPGRepo(pgURL, pgTimeout)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return repo
+
 	case "redis":
 		redisURL := os.Getenv("REDIS_URL")
 		repo, err := red.NewRedisRepository(redisURL)
@@ -70,12 +80,12 @@ func chooseRepo() shortener.RedirectRepository {
 		return repo
 	case "mongo":
 
-		mongoURL := os.Getenv("MONGO_URL")
-		mongoDB := os.Getenv("MONGO_DB")
-		mongoTimeout, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
+		mongoURL := "mongodb+srv://luis:4ulR36RwsoP9SH96@cluster0.qzt86.mongodb.net/urlshortener?retryWrites=true&w=majority" //os.Getenv("MONGO_URL")
+		mongoDB := "redirects"                                                                                                //os.Getenv("MONGO_DB")
+		mongoTimeout := 30                                                                                                    //, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
 		fmt.Println("choose MONGO")
 		repo, err := mdb.NewMongoRepo(mongoURL, mongoDB, mongoTimeout)
-		fmt.Printf("Mongo URL: %s \n", mongoURL)
+		// fmt.Printf("Mongo URL: %s \n", mongoURL)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -84,6 +94,6 @@ func chooseRepo() shortener.RedirectRepository {
 
 	fmt.Println("choose NOTHING")
 
-	return nil
+	// return nil
 
 }
