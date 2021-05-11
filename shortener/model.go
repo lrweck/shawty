@@ -1,6 +1,6 @@
 package shortener
 
-// Struct that serves as a medium between user requests and storage
+// Redirect - Struct that serves as a medium between user requests and storage
 type Redirect struct {
 	Code      string `json:"code" bson:"code" msgpack:"code" `
 	URL       string `json:"url" bson:"url" msgpack:"url" validate:"empty=false & format=url"`
