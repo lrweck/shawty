@@ -80,9 +80,9 @@ func chooseRepo() shortener.RedirectRepository {
 		return repo
 	case "mongo":
 
-		mongoURL := "mongodb+srv://luis:4ulR36RwsoP9SH96@cluster0.qzt86.mongodb.net/urlshortener?retryWrites=true&w=majority" //os.Getenv("MONGO_URL")
-		mongoDB := "redirects"                                                                                                //os.Getenv("MONGO_DB")
-		mongoTimeout := 30                                                                                                    //, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
+		mongoURL := os.Getenv("MONGO_URL")
+		mongoDB := os.Getenv("MONGO_DB")
+		mongoTimeout, _ := strconv.Atoi(os.Getenv("MONGO_TIMEOUT"))
 		fmt.Println("choose MONGO")
 		repo, err := mdb.NewMongoRepo(mongoURL, mongoDB, mongoTimeout)
 		// fmt.Printf("Mongo URL: %s \n", mongoURL)
