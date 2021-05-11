@@ -32,6 +32,7 @@ func newPgClient(pgURL string, timeout int) (*pool.Pool, error) {
 	return connPool, nil
 }
 
+// Creates a new PostgreSQl repository to store and consume data.
 func NewPGRepo(pgURL string, timeout int) (short.RedirectRepository, error) {
 	repo := &pgRepo{
 		timeout: time.Duration(timeout) * time.Second,
@@ -44,6 +45,7 @@ func NewPGRepo(pgURL string, timeout int) (short.RedirectRepository, error) {
 	return repo, nil
 }
 
+// Finds by code the redirect queried
 func (r *pgRepo) Find(code string) (*short.Redirect, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
 	defer cancel()
@@ -66,6 +68,7 @@ func insertOneSQL() string {
 	return `INSERT INTO REDIRECTS (code,url,created_at) VALUES ($1::text,$2::text,$3::timestamptz);`
 }
 
+// Stores the user supplied redirect
 func (r *pgRepo) Store(redirect *short.Redirect) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
 	defer cancel()

@@ -26,6 +26,7 @@ func newRedisClient(redisURL string) (*redis.Client, error) {
 	return client, nil
 }
 
+// Creates a new Redis repository of data using a user supplied URL.
 func NewRedisRepository(redisURL string) (short.RedirectRepository, error) {
 	repo := &redisRepo{}
 	client, err := newRedisClient(redisURL)
@@ -40,6 +41,7 @@ func (r *redisRepo) generateKey(code string) string {
 	return fmt.Sprintf("redirect:%s", code)
 }
 
+// Finds in storage the redirect the user queried by code
 func (r *redisRepo) Find(code string) (*short.Redirect, error) {
 	redirect := &short.Redirect{}
 	key := r.generateKey(code)
@@ -63,6 +65,7 @@ func (r *redisRepo) Find(code string) (*short.Redirect, error) {
 	return redirect, nil
 }
 
+// Stores the user supplied url to a redirect
 func (r *redisRepo) Store(redirect *short.Redirect) error {
 	key := r.generateKey(redirect.Code)
 	data := map[string]interface{}{
