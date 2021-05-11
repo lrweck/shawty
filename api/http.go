@@ -27,20 +27,28 @@ func NewHandler(redirectService sh.RedirectService) RedirectHandler {
 	}
 }
 
-func setupResponse(f *fiber.Ctx, contentType string, statusCode int, body []byte) {
+func setupResponse(f *fiber.Ctx, contentType string, statusCode int, body []byte) error {
 	f.Append("Content-Type", contentType)
 	f.Status(statusCode)
 
 	if err := f.Send(body); err != nil {
 		log.Println(err)
+		return fiber.ErrInternalServerError
 	}
+	return nil
 }
 
 func (h *handler) serializer(contentType string) sh.RedirectSerializer {
-	if contentType == "application/x-msgpack" {
+	switch contentType {
+	case "application/x-msgpack":
 		return &ms.Redirect{}
+	case "application/json":
+		return &js.Redirect{}
+	case "application/xml":
+		return nil
+	default:
+		return nil
 	}
-	return &js.Redirect{}
 }
 
 func (h *handler) Get(f *fiber.Ctx) error {
@@ -77,7 +85,5 @@ func (h *handler) Post(f *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	setupResponse(f, contentType, http.StatusCreated, responseBody)
-
-	return nil
+	return setupResponse(f, contentType, http.StatusCreated, responseBody)
 }
